@@ -572,25 +572,28 @@ async function pullFromFirebase(){
   try{
     const snap=await fbDb.ref('users/'+fbUser.uid+'/jobtrack').once('value');
     const data=snap.val();
-    if(data&&Array.isArray(data.apps)){
+    if(data&&Array.isArray(data.apps)&&data.apps.length>0){
+      // Cloud has data — load it
       apps=data.apps;
       localStorage.setItem(SK,JSON.stringify(apps));
       renderAll();updateStats();
       setSyncStatus('ok');
-      toast('📲 Data loaded from cloud ('+apps.length+' apps)','ok');
+      toast('📲 Loaded '+apps.length+' apps from cloud','ok');
       const info=$('fbSyncInfo');
       if(info&&data.lastModified) info.textContent='Cloud data from: '+new Date(data.lastModified).toLocaleString();
-    } else if(data===null){
-      toast('No cloud data yet — your local data will sync on next change','wa',5000);
+    } else {
+      // Cloud empty or no data yet — push whatever we have locally
       setSyncStatus('ok');
       await pushToFirebase();
-    } else {
-      toast('Cloud data format unrecognised','wa');
-      setSyncStatus('er');
+      if(apps.length>0){
+        toast('☁️ Your data has been uploaded to cloud ('+apps.length+' apps)','ok');
+      } else {
+        toast('✅ Connected! Add applications and they will sync automatically.','ok',4000);
+      }
     }
   }catch(e){
     setSyncStatus('er');
-    toast('Pull failed: '+e.message,'er');
+    toast('Sync failed: '+e.message,'er');
   }
 }
 // ── Tabs ──────────────────────────────────────────────────
