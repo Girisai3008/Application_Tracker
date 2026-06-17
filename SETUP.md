@@ -11,7 +11,7 @@ If the app is already live at https://girisai3008.github.io/Application_Tracker/
 
 1. Open the URL in any browser (desktop or mobile)
 2. Go to the **Sync** tab
-3. Click **Sign in with Google** → sign in with `bheemisettygirisai@gmail.com`
+3. Click **Sign in with Google** → sign in with `[your-google-account@gmail.com]`
 4. Your jobs load automatically from the cloud
 
 That's it — no installation needed.
@@ -185,7 +185,7 @@ Replace `YOURUSERNAME` with your GitHub username.
 Every time you edit `index.html`, deploy with:
 
 ```bash
-cd C:\Users\giris\Application_Tracker
+cd C:\Users\[you]\Application_Tracker
 git add index.html
 git commit -m "Describe what you changed"
 git push
@@ -268,7 +268,7 @@ Data in localStorage is **per browser/device**. Signing in with Google syncs it 
 | Database URL | `https://jobtrack-e09a5-default-rtdb.firebaseio.com` |
 | Auth domain | `jobtrack-e09a5.firebaseapp.com` |
 | Authorized domain | `girisai3008.github.io` |
-| Sign-in account | `bheemisettygirisai@gmail.com` |
+| Sign-in account | `[your-google-account@gmail.com]` |
 | Live URL | https://girisai3008.github.io/Application_Tracker/ |
 | GitHub repo | https://github.com/Girisai3008/Application_Tracker |
-| Local repo path | `C:\Users\giris\Application_Tracker\` |
+| Local repo path | `C:\Users\[you]\Application_Tracker\` |

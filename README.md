@@ -3,8 +3,8 @@
 A single-file PWA (Progressive Web App) for tracking job applications, with Google sign-in and cross-device cloud sync via Firebase.
 
 **Live URL:** https://girisai3008.github.io/Application_Tracker/  
-**GitHub Repo:** https://github.com/Girisai3008/Application_Tracker (Private)  
-**Owner:** Giri — bheemisettygirisai@gmail.com
+**GitHub Repo:** https://github.com/Girisai3008/Application_Tracker (Public)  
+**Owner:** Giri
 
 ---
 
@@ -161,7 +161,8 @@ The app handles **two JSON formats**:
 Old format field mappings applied during import:
 - `dateApplied` → `date`
 - `link` → `url`
-- `resumeName` → `recruiter`
+- `resumeName` → `resumeName`
+- `resumePath` → `resumeUrl`
 - `updatedAt` (ISO string) → `updated` (Unix timestamp)
 
 ---
@@ -175,7 +176,7 @@ Old format field mappings applied during import:
 
 ### To deploy a change:
 ```bash
-cd C:\Users\giris\Application_Tracker
+cd C:\Users\[you]\Application_Tracker
 git add index.html
 git commit -m "Your message"
 git push
@@ -185,12 +186,12 @@ git push
 
 ## Local Development
 
-No build tools needed. Just open `C:\Users\giris\Application_Tracker\index.html` in Chrome.
+No build tools needed. Just open `C:\Users\[you]\Application_Tracker\index.html` in Chrome.
 
 For Firebase auth to work (Google popup), the page must be on HTTPS or localhost — `file://` blocks the popup. Use a local server if testing auth:
 
 ```bash
-cd C:\Users\giris\Application_Tracker
+cd C:\Users\[you]\Application_Tracker
 npx serve .
 # open http://localhost:3000
 ```
@@ -202,7 +203,7 @@ Or just use the live GitHub Pages URL.
 ## File Structure
 
 ```
-C:\Users\giris\Application_Tracker\
+C:\Users\[you]\Application_Tracker\
 ├── index.html     ← Entire app (CSS + HTML + JS, ~942 lines)
 └── README.md      ← This file
 ```
@@ -251,10 +252,10 @@ C:\Users\giris\Application_Tracker\
 
 If you ever lose context or need to resume work on this app:
 
-1. **App file:** `C:\Users\giris\Application_Tracker\index.html`
+1. **App file:** `C:\Users\[you]\Application_Tracker\index.html`
 2. **Firebase Console:** https://console.firebase.google.com/project/jobtrack-e09a5
 3. **Firebase config:** hardcoded in `index.html` — search for `FB_CONFIG`
 4. **Live app:** https://girisai3008.github.io/Application_Tracker/
-5. **Push changes:** run `git add index.html && git commit -m "..." && git push` from `C:\Users\giris\Application_Tracker\`
+5. **Push changes:** run `git add index.html && git commit -m "..." && git push` from `C:\Users\[you]\Application_Tracker\`
 
-Sign in with `bheemisettygirisai@gmail.com` Google account to access your synced job data.
+Sign in with `[your-google-account@gmail.com]` Google account to access your synced job data.
