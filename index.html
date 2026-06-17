@@ -408,6 +408,13 @@ input[type=date],input[type=month]{color-scheme:light}
         Name it <em>JobTrack Sync</em> → Expiration: <em>No expiration</em> → Check only <strong>gist</strong> scope → Generate → Copy & paste above.
       </div>
     </div>
+    <div class="fg" style="max-width:520px;margin-bottom:14px">
+      <label>Gist ID <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional — paste from another device to link existing data)</span></label>
+      <div class="pat-row">
+        <input type="text" id="gistIdInput" placeholder="e.g. a1b2c3d4e5f6... (leave blank to auto-detect)" autocomplete="off" style="font-family:monospace;font-size:.82rem">
+      </div>
+      <div class="hint">If you already set up sync on another device, copy the Gist ID from there (shown in the green box below after connecting) and paste it here before clicking Connect.</div>
+    </div>
     <div class="gist-info" id="gistInfo">
       <strong>✅ Connected!</strong> Your data is saved to a private GitHub Gist.<br>
       Gist ID: <code id="gistIdTxt" style="font-size:.78rem;word-break:break-all"></code>
@@ -595,8 +602,36 @@ function saveToken(){
   const pat=document.getElementById('patInput').value.trim();
   if(!pat){ toast('Please enter your Personal Access Token','er'); return; }
   if(!pat.startsWith('ghp_')&&!pat.startsWith('github_pat_')){ toast('Token should start with ghp_ — please check and try again','wa'); }
-  const s=getS(); s.githubPAT=pat; setS(s);
-  updateSettingsUI(); syncToGist();
+  const manualGistId=(document.getElementById('gistIdInput')||{}).value?.trim()||'';
+  const s=getS(); s.githubPAT=pat;
+  if(manualGistId){ s.gistId=manualGistId; }
+  setS(s); updateSettingsUI(); findAndConnectGist();
+}
+
+async function findAndConnectGist(){
+  const token=getToken(); if(!token) return;
+  // If we already have a gistId (manually entered or previously saved), just load from it
+  if(getGistId()){ setSyncStatus('syncing'); await loadFromGist(); return; }
+  setSyncStatus('syncing');
+  try{
+    // Search all user gists for an existing JobTrack gist
+    const res=await fetch('https://api.github.com/gists?per_page=100',{headers:{'Authorization':'token '+token}});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const gists=await res.json();
+    const existing=gists.find(g=>g.files&&g.files[GIST_FILE]);
+    if(existing){
+      const s=getS(); s.gistId=existing.id; setS(s);
+      updateSettingsUI();
+      toast('☁️ Found your existing JobTrack Gist! Loading data…','ok');
+      await loadFromGist();
+    } else {
+      // No existing gist found — create a fresh one
+      await syncToGist();
+    }
+  }catch(e){
+    setSyncStatus('er');
+    toast('❌ Could not connect: '+e.message,'er');
+  }
 }
 function disconnectGist(){
   const s=getS(); delete s.githubPAT; delete s.gistId; delete s.lastGistSync; setS(s);
@@ -608,6 +643,7 @@ function updateSettingsUI(){
   const pi=document.getElementById('patInput'),gi=document.getElementById('gistInfo'),gt=document.getElementById('gistIdTxt');
   const snb=document.getElementById('syncNowBtn'),pb=document.getElementById('pullBtn'),db=document.getElementById('disconnectBtn');
   if(pi&&token) pi.value=token;
+  const gii=document.getElementById('gistIdInput'); if(gii&&gistId) gii.value=gistId;
   if(gi) gi.classList.toggle('show',!!gistId);
   if(gt&&gistId) gt.textContent=gistId;
   if(snb) snb.classList.toggle('hidden',!token);
