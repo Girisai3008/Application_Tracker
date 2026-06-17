@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>JobTrack — Application Tracker</title>
+<title>JobTrack — Job Tracker</title>
 <meta name="description" content="Track your job applications offline and online">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -235,7 +235,7 @@ tbody td{padding:11px 13px;vertical-align:middle}
     <div class="hdr-right">
       <span class="sync-badge" id="syncBadge" onclick="goSyncTab()">☁️ Not synced</span>
       <button class="icon-btn" onclick="toggleTheme()" title="Toggle theme">🌓</button>
-      <button class="btn btn-p" onclick="openAdd()">+ Add</button>
+      <button class="btn btn-p" onclick="openAdd()">+ Add Job</button>
     </div>
   </div>
 </header>
@@ -250,7 +250,7 @@ tbody td{padding:11px 13px;vertical-align:middle}
 <!-- TABS -->
 <div class="tabs">
   <div class="tabs-inner">
-    <button class="tab act" onclick="showTab('apps',this)">Applications</button>
+    <button class="tab act" onclick="showTab('apps',this)">Jobs</button>
     <button class="tab" onclick="showTab('daily',this)">Daily View</button>
     <button class="tab" onclick="showTab('analytics',this)">Analytics</button>
     <button class="tab" onclick="showTab('backup',this)">Backup</button>
@@ -323,7 +323,7 @@ tbody td{padding:11px 13px;vertical-align:middle}
     </div>
     <div class="bsec">
       <h3>🗑️ Clear All Data</h3>
-      <p>Permanently delete all application records. This cannot be undone.</p>
+      <p>Permanently delete all job records. This cannot be undone.</p>
       <button class="btn btn-d" onclick="confirmClearAll()">Clear All Data</button>
     </div>
   </div>
@@ -630,7 +630,7 @@ function updateStats(){
     const n=d.fn(apps);
     return (i>0&&i===1?'<div class="sdiv"></div>':'')+`<div class="sc"><div class="n">${n}</div><div class="l">${d.l}</div></div>`;
   }).join('');
-  $('ftCount').textContent=apps.length+' application'+(apps.length===1?'':'s');
+  $('ftCount').textContent=apps.length+' job'+(apps.length===1?'':'s');
 }
 // ── Render Apps ───────────────────────────────────────────
 function getFiltered(){
@@ -653,7 +653,7 @@ function renderApps(){
   const filtered=getFiltered();
   const c=$('appsContent');
   if(!filtered.length){
-    c.innerHTML=`<div class="empty"><div class="ei">📋</div><h3>${apps.length?'No results':'No applications yet'}</h3><p>${apps.length?'Try clearing your filters.':'Add your first application to get started.'}</p>${!apps.length?'<button class="btn btn-p" onclick="openAdd()">+ Add Application</button>':''}</div>`;
+    c.innerHTML=`<div class="empty"><div class="ei">📋</div><h3>${apps.length?'No results':'No jobs yet'}</h3><p>${apps.length?'Try clearing your filters.':'Add your first job to get started.'}</p>${!apps.length?'<button class="btn btn-p" onclick="openAdd()">+ Add Job</button>':''}</div>`;
     return;
   }
   if(view==='table') renderTable(filtered,c);
@@ -761,7 +761,7 @@ function renderAnalytics(){
 }
 // ── CRUD ──────────────────────────────────────────────────
 function openAdd(){
-  editId=null;$('moTitle').textContent='Add Application';$('moSave').textContent='Add';
+  editId=null;$('moTitle').textContent='Add Job';$('moSave').textContent='Add';
   ['fCo','fTi','fLoc','fSal','fUrl','fRec','fREm','fNo'].forEach(id=>$(id).value='');
   $('fSt').value='Applied';$('fSrc').value='';
   $('fDt').value=today();$('dupWarn').className='dup-warn';
@@ -769,7 +769,7 @@ function openAdd(){
 }
 function openEdit(id){
   const a=apps.find(x=>x.id===id);if(!a)return;
-  editId=id;$('moTitle').textContent='Edit Application';$('moSave').textContent='Save Changes';
+  editId=id;$('moTitle').textContent='Edit Job';$('moSave').textContent='Save Changes';
   $('fCo').value=a.company||'';$('fTi').value=a.title||'';$('fSt').value=a.status||'Applied';
   $('fDt').value=a.date||today();$('fLoc').value=a.location||'';$('fSal').value=a.salary||'';
   $('fUrl').value=a.url||'';$('fRec').value=a.recruiter||'';$('fREm').value=a.recruiterEmail||'';
@@ -819,7 +819,7 @@ function doDelete(){
 }
 function confirmClearAll(){
   $('coTitle').textContent='Clear All Data';
-  $('coMsg').textContent='This will permanently delete ALL '+apps.length+' application records. This cannot be undone.';
+  $('coMsg').textContent='This will permanently delete ALL '+apps.length+' job records. This cannot be undone.';
   $('coOk').textContent='Clear All';$('coOk').onclick=()=>{apps=[];save();closeConfirm();toast('All data cleared','wa');};
   $('coDialog').classList.add('open');
 }
