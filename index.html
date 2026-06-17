@@ -834,8 +834,9 @@ function exportJSON(){
   dl(blob,'jobtrack-'+today()+'.json');toast('JSON exported','ok');
 }
 function exportCSV(){
-  const h=['Company','Title','Status','Date','Location','Salary','URL','Recruiter','RecruiterEmail','Source','Notes'];
-  const rows=apps.map(a=>[a.company,a.title,a.status,a.date,a.location||'',a.salary||'',a.url||'',a.recruiter||'',a.recruiterEmail||'',a.source||'',a.notes||''].map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(','));
+  const h=['Company','Title','Status','Date','Location','Salary','URL','Recruiter','RecruiterEmail','Source','ResumeName','ResumeUrl','Notes'];
+  const q=v=>'"'+String(v||'').replace(/"/g,'""')+'"';
+  const rows=apps.map(a=>[a.company,a.title,a.status,a.date,a.location||'',a.salary||'',a.url||'',a.recruiter||'',a.recruiterEmail||'',a.source||'',a.resumeName||'',a.resumeUrl||'',a.notes||''].map(q).join(','));
   const blob=new Blob([[h.join(','),...rows].join('\n')],{type:'text/csv'});
   dl(blob,'jobtrack-'+today()+'.csv');toast('CSV exported','ok');
 }
@@ -859,17 +860,23 @@ function importJSON(inp){
           url:a.link||a.url||'',
           location:a.location||'',
           salary:a.salary||'',
-          recruiter:a.resumeName||a.recruiter||'',
+          recruiter:a.recruiter||'',
           recruiterEmail:a.recruiterEmail||'',
           source:a.source||'',
+          resumeName:a.resumeName||'',
+          resumeUrl:a.resumePath||a.resumeUrl||'',
           notes:a.notes||'',
           updated:a.updatedAt?new Date(a.updatedAt).getTime():Date.now()
         }));
       }
-      const existing=new Set(apps.map(a=>a.id));
-      const added=imp.filter(a=>!existing.has(a.id));
-      apps=[...apps,...added];save();
-      toast(`Imported ${added.length} new apps (${imp.length-added.length} duplicates skipped)`,'ok',5000);
+      const idxMap=new Map(apps.map((a,i)=>[a.id,i]));
+      let addedCount=0,updatedCount=0;
+      imp.forEach(a=>{
+        if(idxMap.has(a.id)){apps[idxMap.get(a.id)]={...apps[idxMap.get(a.id)],...a};updatedCount++;}
+        else{apps.unshift(a);addedCount++;}
+      });
+      save();
+      toast(`Imported: ${addedCount} new, ${updatedCount} updated`,'ok',5000);
     }catch(err){toast('Invalid JSON file: '+err.message,'er');}
     inp.value='';
   };r.readAsText(f);
@@ -878,18 +885,28 @@ function importCSV(inp){
   const f=inp.files[0];if(!f)return;
   const r=new FileReader();r.onload=e=>{
     try{
-      const lines=e.target.result.split('\n').slice(1).filter(l=>l.trim());
+      const lines=e.target.result.split('\n').filter(l=>l.trim());
+      if(!lines.length){toast('Empty CSV','er');return;}
+      const hdrs=lines[0].split(',').map(h=>h.replace(/^"|"$/g,'').trim().toLowerCase());
+      const get=(cols,name,idx)=>{const i=hdrs.indexOf(name);return i>=0?cols[i]:cols[idx]||'';};
+      const dataLines=lines.slice(1).filter(l=>l.trim());
       const added=[];
-      lines.forEach(line=>{
+      dataLines.forEach(line=>{
         const cols=line.match(/("(?:[^"]|"")*"|[^,]*)/g).map(v=>v.replace(/^"|"$/g,'').replace(/""/g,'"'));
-        if(cols[0]&&cols[1]){
-          added.push({id:uid(),company:cols[0],title:cols[1],status:cols[2]||'Applied',date:cols[3]||today(),
-            location:cols[4]||'',salary:cols[5]||'',url:cols[6]||'',recruiter:cols[7]||'',
-            recruiterEmail:cols[8]||'',source:cols[9]||'',notes:cols[10]||'',updated:Date.now()});
-        }
+        if(!cols[0]&&!cols[1])return;
+        added.push({id:uid(),
+          company:get(cols,'company',0),title:get(cols,'title',1)||get(cols,'job title',1),
+          status:get(cols,'status',2)||'Applied',date:get(cols,'date',3)||get(cols,'date applied',3)||today(),
+          location:get(cols,'location',4)||'',salary:get(cols,'salary',5)||'',
+          url:get(cols,'url',6)||get(cols,'job link',6)||'',
+          recruiter:get(cols,'recruiter',7)||'',recruiterEmail:get(cols,'recruiteremail',8)||'',
+          source:get(cols,'source',9)||'',
+          resumeName:get(cols,'resumename',10)||get(cols,'resume name',10)||'',
+          resumeUrl:get(cols,'resumeurl',11)||get(cols,'resume path',11)||get(cols,'resume url',11)||'',
+          notes:get(cols,'notes',12)||'',updated:Date.now()});
       });
-      apps=[...apps,...added];save();toast(`Imported ${added.length} apps from CSV`,'ok');
-    }catch{toast('Could not parse CSV','er');}
+      apps=[...apps,...added];save();toast('Imported '+added.length+' jobs from CSV','ok');
+    }catch(err){toast('Could not parse CSV: '+err.message,'er');}
     inp.value='';
   };r.readAsText(f);
 }
