@@ -870,12 +870,32 @@ function importJSON(inp){
   const r=new FileReader();r.onload=e=>{
     try{
       const d=JSON.parse(e.target.result);
-      const imp=Array.isArray(d)?d:(d.apps||[]);
+      let imp=[];
+      if(Array.isArray(d)) imp=d;
+      else if(d.apps) imp=d.apps;
+      else if(d.applications){
+        // Convert from old JobTrack format
+        imp=d.applications.map(a=>({
+          id:a.id||uid(),
+          company:a.company||'',
+          title:a.title||'',
+          status:a.status||'Applied',
+          date:a.dateApplied||a.date||today(),
+          url:a.link||a.url||'',
+          location:a.location||'',
+          salary:a.salary||'',
+          recruiter:a.resumeName||a.recruiter||'',
+          recruiterEmail:a.recruiterEmail||'',
+          source:a.source||'',
+          notes:a.notes||'',
+          updated:a.updatedAt?new Date(a.updatedAt).getTime():Date.now()
+        }));
+      }
       const existing=new Set(apps.map(a=>a.id));
       const added=imp.filter(a=>!existing.has(a.id));
       apps=[...apps,...added];save();
       toast(`Imported ${added.length} new apps (${imp.length-added.length} duplicates skipped)`,'ok',5000);
-    }catch{toast('Invalid JSON file','er');}
+    }catch(err){toast('Invalid JSON file: '+err.message,'er');}
     inp.value='';
   };r.readAsText(f);
 }
