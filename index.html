@@ -403,6 +403,8 @@ tbody td{padding:11px 13px;vertical-align:middle}
           <option>Glassdoor</option><option>Company Site</option><option>Referral</option><option>Other</option>
         </select>
       </div>
+      <div class="fg"><label>Resume Name</label><input id="fResName" placeholder="Adobe_R169356_Bheemisetty"></div>
+      <div class="fg"><label>Resume URL / Path</label><input id="fResUrl" placeholder="https://… or file path"></div>
       <div class="fg full"><label>Notes</label><textarea id="fNo" placeholder="Interview notes, follow-up dates…"></textarea></div>
     </div>
     <div class="fact">
@@ -762,7 +764,7 @@ function renderAnalytics(){
 // ── CRUD ──────────────────────────────────────────────────
 function openAdd(){
   editId=null;$('moTitle').textContent='Add Job';$('moSave').textContent='Add';
-  ['fCo','fTi','fLoc','fSal','fUrl','fRec','fREm','fNo'].forEach(id=>$(id).value='');
+  ['fCo','fTi','fLoc','fSal','fUrl','fRec','fREm','fResName','fResUrl','fNo'].forEach(id=>$(id).value='');
   $('fSt').value='Applied';$('fSrc').value='';
   $('fDt').value=today();$('dupWarn').className='dup-warn';
   $('appMo').classList.add('open');$('fCo').focus();
@@ -773,7 +775,7 @@ function openEdit(id){
   $('fCo').value=a.company||'';$('fTi').value=a.title||'';$('fSt').value=a.status||'Applied';
   $('fDt').value=a.date||today();$('fLoc').value=a.location||'';$('fSal').value=a.salary||'';
   $('fUrl').value=a.url||'';$('fRec').value=a.recruiter||'';$('fREm').value=a.recruiterEmail||'';
-  $('fSrc').value=a.source||'';$('fNo').value=a.notes||'';
+  $('fSrc').value=a.source||'';$('fResName').value=a.resumeName||'';$('fResUrl').value=a.resumeUrl||'';$('fNo').value=a.notes||'';
   $('dupWarn').className='dup-warn';$('appMo').classList.add('open');$('fCo').focus();
 }
 function closeMo(){$('appMo').classList.remove('open');}
@@ -783,7 +785,8 @@ function saveApp(){
   const app={id:editId||uid(),company:co,title:ti,status:$('fSt').value,date:$('fDt').value,
     location:$('fLoc').value.trim(),salary:$('fSal').value.trim(),url:$('fUrl').value.trim(),
     recruiter:$('fRec').value.trim(),recruiterEmail:$('fREm').value.trim(),
-    source:$('fSrc').value,notes:$('fNo').value.trim(),updated:Date.now()};
+    source:$('fSrc').value,resumeName:$('fResName').value.trim(),resumeUrl:$('fResUrl').value.trim(),
+    notes:$('fNo').value.trim(),updated:Date.now()};
   if(editId){const i=apps.findIndex(x=>x.id===editId);if(i>-1)apps[i]=app;toast('Application updated','ok');}
   else{apps.unshift(app);toast('Application added','ok');}
   closeMo();save();

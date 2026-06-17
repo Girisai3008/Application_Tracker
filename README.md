@@ -118,9 +118,11 @@ users/
 | Job URL | `url` | |
 | Location | `location` | |
 | Salary | `salary` | |
-| Recruiter Name | `recruiter` | Also used for resume name during import |
+| Recruiter Name | `recruiter` | |
 | Recruiter Email | `recruiterEmail` | |
 | Source | `source` | LinkedIn / Indeed / etc. |
+| Resume Name | `resumeName` | e.g. `Adobe_R169356_Bheemisetty` |
+| Resume URL / Path | `resumeUrl` | URL or local file path to the resume used |
 | Notes | `notes` | Free text |
 | Last Updated | `updated` | Unix timestamp |
 
